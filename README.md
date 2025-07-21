@@ -75,10 +75,12 @@ This part is fairly open-ended. Think of a question that can be answered with th
 
 In the cell below, we:
 
-* Import and alias `pandas` as `pd`
-* Import and alias `numpy` as `np`
-* Import and alias `seaborn` as `sns`
-* Import and alias `matplotlib.pyplot` as `plt`
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+%matplotlib inline
 * Set Matplotlib visualizations to display inline in the notebook
 
 
@@ -101,6 +103,7 @@ In the cell below, load `heroes_information.csv` as `heroes_df`:
 ```python
 # Your code here
 
+heroes_df = pd.read_csv('heroes_information.csv')
 heroes_df.head()
 ```
 
@@ -115,6 +118,7 @@ There are two ways to do this:
 ```python
 # Your code here
 
+heroes_df = pd.read_csv('heroes_information.csv', index_col=0)
 heroes_df.head()
 ```
 
@@ -158,6 +162,7 @@ In the cell below, inspect the overall shape of the dataframe:
 
 ```python
 # Your code here
+heroes_df.shape
 ```
 
 Now let's look at the info printout:
@@ -174,7 +179,8 @@ In the cell below, interpret that information. Do the data types line up with wh
 ```python
 # Replace None with appropriate text
 """
-None
+The data lines up to what we expect
+There are missing values in Publisher(15) and Weight (2) columns
 """
 ```
 
@@ -185,6 +191,8 @@ Now, repeat the same process with `super_hero_powers.csv`. Name the dataframe `p
 
 ```python
 # Your code here (create more cells as needed)
+powers_df = pd.read_csv('super_hero_powers.csv', index_col=0)
+powers_df.head()
 ```
 
 The following code will check if it was loaded correctly:
@@ -250,7 +258,7 @@ Write your answer below, and explain how it relates to the information we have:
 ```python
 # Replace None with appropriate text
 """
-None
+The strategy here is to fill in the missing values with another value since the missing values are insignificant compared to the total number of rows
 """
 ```
 
@@ -258,7 +266,7 @@ Now, implement the strategy to drop rows with missing values using code. (You ca
 
 
 ```python
-# Your code here
+heroes_df = heroes_df[heroes_df["Publisher"].notna()]
 ```
 
 Now there should be no missing values in the publisher column:
@@ -289,7 +297,7 @@ Identify those two cases below:
 ```python
 # Replace None with appropriate text
 """
-None
+DC Comics appear twice in the data while Marvel Comics and Marvel appear to be the same
 """
 ```
 
@@ -298,6 +306,8 @@ Now, write some code to handle these cases. If you're not sure where to start, l
 
 ```python
 # Your code here
+heroes_df["Publisher"] = heroes_df["Publisher"].str.strip()  
+heroes_df["Publisher"] = heroes_df["Publisher"].replace("Marvel", "Marvel Comics")
 ```
 
 Check your work below:
@@ -366,7 +376,7 @@ In the cell below, identify the shared key, and your strategy for joining the da
 ```python
 # Replace None with appropriate text
 """
-None
+The shared key is the name
 """
 ```
 
@@ -377,6 +387,15 @@ In the cell below, create a new dataframe called `heroes_and_powers_df` that con
 
 ```python
 # Your code here (create more cells as needed)
+powers_transposed = powers_df.T
+
+heroes_and_powers_df = pd.merge(
+    heroes_df, 
+    powers_transposed, 
+    left_on="name", 
+    right_index=True,
+    how="inner"  
+)
 ```
 
 Run the code below to check your work:
@@ -551,6 +570,18 @@ Don't worry if the rows or columns are in a different order, all that matters is
 
 ```python
 # Your code here (create more cells as needed)
+
+power_counts_by_publisher = heroes_and_powers_df.groupby("Publisher")[powers_df.index].sum()
+
+power_counts_filtered = power_counts_by_publisher.loc[["DC Comics", "Marvel Comics"]]
+
+question_3_df = power_counts_filtered.T.reset_index()
+
+question_3_df.rename(columns={"index": "Superpower Name"}, inplace=True)
+
+question_3_df.shape
+question_3_df.columns
+
 ```
 
 The code below checks that you have the correct dataframe structure:
@@ -631,8 +662,9 @@ Explain your question below:
 
 ```python
 # Replace None with appropriate text:
+
 """
-None
+How are eye color and hair color related in this dataset?
 """
 ```
 
